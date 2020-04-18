@@ -79,5 +79,5 @@ func (pk PublicKey) VerifyJSON(out, BA []byte) ([]byte, error) {
 	if pk.VerifyDetached(BP, their.Sig) {
 		return out, nil
 	}
-	return out, ErrMismatch
+	return out, fmt.Errorf("signature of %q is %q, not %q: %w", string(BP), pk, their.Sig, ErrMismatch)
 }
