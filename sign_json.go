@@ -13,9 +13,9 @@ import (
 	"unicode"
 )
 
-const naclSig = `,"naclSig:":"`
+const naclSig = `,"naclSig":"`
 
-// JSONOverhead is the size of `"naclSig:":"tzCU4IasEj9jYNAMEY1YxM1bHAZoSSH/PHQL2mLLsCDD8QCW17g8wDGVBmZQn8lwulhHU0aRYOnZ11D9dwcuAQ=="}`
+// JSONOverhead is the size of `"naclSig":"tzCU4IasEj9jYNAMEY1YxM1bHAZoSSH/PHQL2mLLsCDD8QCW17g8wDGVBmZQn8lwulhHU0aRYOnZ11D9dwcuAQ=="}`
 const JSONOverhead = 102
 
 // SignJSON signs the given SERIALIZED JSON following
@@ -71,13 +71,15 @@ func (pk PublicKey) VerifyJSON(out, BA []byte) ([]byte, error) {
 	BS[0] = '{'
 	var their Signature
 	err := json.Unmarshal(BS, &their)
-	BS[1] = ','
 	if err != nil {
 		return nil, fmt.Errorf("%v: %w", err, BadFormat)
+	} else if len(their.Sig) == 0 {
+		return nil, fmt.Errorf("empty sig from %q: %w", string(BS), BadFormat)
 	}
+	BS[0] = ','
 	out = append(append(out, BP...), '}')
 	if pk.VerifyDetached(BP, their.Sig) {
 		return out, nil
 	}
-	return out, fmt.Errorf("signature of %q is %q, not %q: %w", string(BP), pk, their.Sig, ErrMismatch)
+	return out, fmt.Errorf("signature of %q is not %q: %w", string(BP), their.Sig, ErrMismatch)
 }
