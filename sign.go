@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"strings"
 
+	"golang.org/x/crypto/ed25519"
 	"golang.org/x/crypto/nacl/sign"
 )
 
@@ -21,6 +22,8 @@ const (
 	NaCLPublicPrefix = "nacl"
 	// NaCLPrivatePreifx is the prefix for private keys.
 	NaCLPrivatePrefix = "NACL-SECRET-KEY-"
+	// Overhead bytes is the size of the signature
+	Overhead = sign.Overhead
 )
 
 // PublicKey is the public key bytes.
@@ -81,4 +84,22 @@ func Open(out, signedMessage []byte, publicKey PublicKey) (message []byte, ok bo
 // Sign the message with the given private key, return the signed message appended to out.
 func Sign(out, message []byte, privateKey PrivateKey) []byte {
 	return sign.Sign(out, message, (*[64]byte)(&privateKey))
+}
+
+func (pk PrivateKey) Sign(out, message []byte) []byte {
+	return Sign(out, message, pk)
+}
+
+// SignDetached returns only the signature of the message.
+func (pk PrivateKey) SignDetached(message []byte) (sig []byte) {
+	return ed25519.Sign(ed25519.PrivateKey(pk[:]), message)
+}
+
+func (pk PublicKey) Open(out, message []byte) ([]byte, bool) {
+	return Open(out, message, pk)
+}
+
+// VerifyDetached verifies the message and the signature.
+func (pk PublicKey) VerifyDetached(message, sig []byte) bool {
+	return ed25519.Verify(ed25519.PublicKey(pk[:]), message, sig)
 }
