@@ -7,15 +7,18 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 
 	"github.com/UNO-SOFT/signify-nacl"
+	"github.com/tgulacsi/go/zlog"
 )
+
+var logger = zlog.New(zlog.MaybeConsoleWriter(os.Stderr))
 
 func main() {
 	if err := Main(); err != nil {
-		log.Fatal(err)
+		logger.Error(err, "Main")
+		os.Exit(1)
 	}
 }
 
