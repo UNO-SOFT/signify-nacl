@@ -39,8 +39,8 @@ func (pk PrivateKey) SignJSON(out, J []byte) []byte {
 var (
 	// ErrMismatch is the error for signature mismatch in verification.
 	ErrMismatch = errors.New("signature mismatch")
-	// BadFormat is returned when the formatting is uncomprehensible.
-	BadFormat = errors.New("bad format")
+	// ErrBadFormat is returned when the formatting is uncomprehensible.
+	ErrBadFormat = errors.New("bad format")
 )
 
 // VerifyJSON verifies the given signed JSON and returns the payload
@@ -62,7 +62,7 @@ var (
 func (pk PublicKey) VerifyJSON(out, BA []byte) ([]byte, error) {
 	i := bytes.LastIndex(BA, []byte(naclSig))
 	if i < 0 {
-		return BA, fmt.Errorf("no %q: %w", naclSig, BadFormat)
+		return BA, fmt.Errorf("no %q: %w", naclSig, ErrBadFormat)
 	}
 	type Signature struct {
 		Sig []byte `json:"naclSig"`
@@ -72,9 +72,9 @@ func (pk PublicKey) VerifyJSON(out, BA []byte) ([]byte, error) {
 	var their Signature
 	err := json.Unmarshal(BS, &their)
 	if err != nil {
-		return nil, fmt.Errorf("%v: %w", err, BadFormat)
+		return nil, fmt.Errorf("%v: %w", err, ErrBadFormat)
 	} else if len(their.Sig) == 0 {
-		return nil, fmt.Errorf("empty sig from %q: %w", string(BS), BadFormat)
+		return nil, fmt.Errorf("empty sig from %q: %w", string(BS), ErrBadFormat)
 	}
 	BS[0] = ','
 	out = append(append(out, BP...), '}')

@@ -6,7 +6,7 @@ package signify
 
 import (
 	"fmt"
-	"io/ioutil"
+	"io"
 	"os"
 )
 
@@ -33,7 +33,7 @@ func GenerateKeyFiles(pubKeyFile, privKeyFile string) error {
 				return err
 			}
 		} else {
-			if err := ioutil.WriteFile(s.fn, []byte(s.s.String()), s.mode); err != nil {
+			if err := os.WriteFile(s.fn, []byte(s.s.String()), s.mode); err != nil {
 				return err
 			}
 		}
@@ -45,7 +45,7 @@ func SignFile(privKey, privKeyFile, privKeyEnv, sigFile, msgFile string) error {
 	var priv PrivateKey
 	if privKey == "" {
 		if privKeyFile != "" {
-			b, err := ioutil.ReadFile(privKeyFile)
+			b, err := os.ReadFile(privKeyFile)
 			if err != nil {
 				return fmt.Errorf("read private key from %q: %w", privKeyFile, err)
 			}
@@ -61,9 +61,9 @@ func SignFile(privKey, privKeyFile, privKeyEnv, sigFile, msgFile string) error {
 	var msg []byte
 	var err error
 	if msgFile == "" || msgFile == "-" {
-		msg, err = ioutil.ReadAll(os.Stdin)
+		msg, err = io.ReadAll(os.Stdin)
 	} else {
-		msg, err = ioutil.ReadFile(msgFile)
+		msg, err = os.ReadFile(msgFile)
 	}
 	if err != nil {
 		return fmt.Errorf("read message from %q: %w", msgFile, err)
@@ -72,7 +72,7 @@ func SignFile(privKey, privKeyFile, privKeyEnv, sigFile, msgFile string) error {
 	if sigFile == "" || sigFile == "-" {
 		_, err = os.Stdout.Write(out)
 	} else {
-		err = ioutil.WriteFile(sigFile, out, 0640)
+		err = os.WriteFile(sigFile, out, 0640)
 	}
 	if err != nil {
 		return fmt.Errorf("write signed message to %q: %w", sigFile, err)
@@ -84,7 +84,7 @@ func VerifyFile(pubKey, pubKeyFile, pubKeyEnv, sigFile, msgFile string) error {
 	var pub PublicKey
 	if pubKey == "" {
 		if pubKeyFile != "" {
-			b, err := ioutil.ReadFile(pubKeyFile)
+			b, err := os.ReadFile(pubKeyFile)
 			if err != nil {
 				return fmt.Errorf("read public key from %q: %w", pubKeyFile, err)
 			}
@@ -100,9 +100,9 @@ func VerifyFile(pubKey, pubKeyFile, pubKeyEnv, sigFile, msgFile string) error {
 	var sig []byte
 	var err error
 	if sigFile == "" || sigFile == "-" {
-		sig, err = ioutil.ReadAll(os.Stdin)
+		sig, err = io.ReadAll(os.Stdin)
 	} else {
-		sig, err = ioutil.ReadFile(sigFile)
+		sig, err = os.ReadFile(sigFile)
 	}
 	if err != nil {
 		return fmt.Errorf("read signed message from %q: %w", sigFile, err)
@@ -114,7 +114,7 @@ func VerifyFile(pubKey, pubKeyFile, pubKeyEnv, sigFile, msgFile string) error {
 	if msgFile == "" || msgFile == "-" {
 		_, err = os.Stdout.Write(out)
 	} else {
-		err = ioutil.WriteFile(msgFile, out, 0640)
+		err = os.WriteFile(msgFile, out, 0640)
 	}
 	if err != nil {
 		return fmt.Errorf("write message to %q: %w", msgFile, err)

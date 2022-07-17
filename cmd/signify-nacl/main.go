@@ -28,7 +28,7 @@ func Main() error {
 		fmt.Fprintf(flag.CommandLine.Output(), `Usage of %[1]s:
 
 	%[1]s -G/generate/gen/g -p pubkey -s seckey
-	%[1]s -S/sign/sig/s [-x sigfile] -s seckey -m message
+	%[1]s -S/sign/sig/s [-x sigfile] [-ascii] -s seckey -m message
 	%[1]s -V/verify/ver/v -p pubkey [-x sigfile] -m message
 
 `, nm)
@@ -51,6 +51,7 @@ func Main() error {
 	signFlags.StringVar(&privKeyEnv, "env", signify.DefaultPrivKeyEnv, "environment variable to read the private key from")
 	signFlags.StringVar(&msgFile, "m", "-", "message file")
 	signFlags.StringVar(&sigFile, "x", "-", "signed message file to write to")
+	signFlags.BoolVar(&ascii, "ascii", false, "ascii-safe sign")
 
 	var pubKey, pubKeyEnv string
 	verifyFlags := flag.NewFlagSet("verify", flag.ContinueOnError)
