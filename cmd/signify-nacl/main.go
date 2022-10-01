@@ -10,7 +10,7 @@ import (
 	"os"
 
 	"github.com/UNO-SOFT/signify-nacl"
-	"github.com/tgulacsi/go/zlog"
+	"github.com/UNO-SOFT/zlog"
 )
 
 var logger = zlog.New(zlog.MaybeConsoleWriter(os.Stderr))
@@ -43,6 +43,7 @@ func Main() error {
 	genFlags.StringVar(&pubKeyFile, "p", "-", "public key file")
 	genFlags.StringVar(&privKeyFile, "s", "-", "secret key file")
 
+	var ascii bool
 	var msgFile, sigFile string
 	var privKey, privKeyEnv string
 	signFlags := flag.NewFlagSet("sign", flag.ContinueOnError)
