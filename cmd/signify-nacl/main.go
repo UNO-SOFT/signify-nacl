@@ -10,19 +10,21 @@ import (
 	"os"
 
 	"github.com/UNO-SOFT/signify-nacl"
-	"github.com/UNO-SOFT/zlog"
+	"github.com/UNO-SOFT/zlog/v2"
 )
 
-var logger = zlog.New(zlog.MaybeConsoleWriter(os.Stderr))
+var verbose zlog.VerboseVar
+var logger = zlog.NewLogger(zlog.MaybeConsoleHandler(&verbose, os.Stderr)).SLog()
 
 func main() {
 	if err := Main(); err != nil {
-		logger.Error(err, "Main")
+		logger.Error("Main", "error", err)
 		os.Exit(1)
 	}
 }
 
 func Main() error {
+	flag.Var(&verbose, "v", "verbose logging")
 	flag.Usage = func() {
 		nm := os.Args[0]
 		fmt.Fprintf(flag.CommandLine.Output(), `Usage of %[1]s:
@@ -91,6 +93,4 @@ func Main() error {
 	default:
 		panic("unreachable")
 	}
-
-	return nil
 }
